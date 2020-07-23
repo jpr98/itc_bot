@@ -1,5 +1,6 @@
 .DS_Store
 
 client_secret.json
+bot_secret.txt
 .vscode
 __pycache__

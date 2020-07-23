@@ -70,4 +70,4 @@ async def _list(ctx, course_code):
         msg = f'{course_code} has no waitlist'
     await ctx.send(msg)
 
-client.run('NzMzMTU4ODczOTA4NzcyOTM0.Xw_FeA.XFJpFLVcDLXaTNrFaK2YcDX4bSA')
+client.run(open('bot_secret.txt', 'r').read())
