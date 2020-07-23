@@ -12,7 +12,7 @@ client = gspread.authorize(creds)
 workspace = client.open("New spreadsheet from python")
 sheet = workspace.sheet1
 
-#wspc.share('juanpramoss98@gmail.com', perm_type='user', role='owner')
+#workspace.share('juanpramoss98@gmail.com', perm_type='user', role='reader')
 
 def export_to_sheets():
     sheet.clear()
