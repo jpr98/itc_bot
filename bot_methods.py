@@ -80,3 +80,28 @@ def get_course_waitlist(course_code):
             if course_code in course:
                 return course[course_code], GetWaitlistResult.SUCCESS
     return [], GetWaitlistResult.NO_COURSE
+
+def add_to_queue_in_guild(user, guild):
+    guild_id = guild_bot_id(guild)
+    validate_guild_in_dict(guild_id)
+    guild_dict[guild_id]['queue'].append(user)
+
+def leave_from_queue_in_guild(user, guild):
+    guild_id = guild_bot_id(guild)
+    validate_guild_in_dict(guild_id)
+    if user in guild_dict[guild_id]['queue']:
+        guild_dict[guild_id]['queue'].remove(user)
+
+def get_next_from_queue_in_guild(assistant, guild):
+    guild_id = guild_bot_id(guild)
+    validate_guild_in_dict(guild_id)
+    next_user = guild_dict[guild_id]['queue'][0]
+    guild_dict[guild_id]['queue'].remove(next_user)
+    return next_user
+
+def get_guild_queue(guild):
+    """ Use this as read-only
+    """
+    guild_id = guild_bot_id(guild)
+    validate_guild_in_dict(guild_id)
+    return guild_dict[guild_id]['queue']
