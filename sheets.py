@@ -9,7 +9,7 @@ client = gspread.authorize(creds)
 
 # Find a workbook by name and open the first sheet
 # Make sure you use the right name here.
-workspace = client.open("New spreadsheet from python")
+workspace = client.open("Inscripciones AD2020 Waitlist Discord")
 sheet = workspace.sheet1
 
 #workspace.share('juanpramoss98@gmail.com', perm_type='user', role='reader')
