@@ -22,8 +22,9 @@ def add_course_to_guild(code, global_course=False, guild='global'): # gets glob
     else:
         guild_id = guild_bot_id(guild)
     validate_guild_in_dict(guild_id)
-    if code in guild_dict[guild_id]['courses']:
-        return False
+    for dic in guild_dict[guild_id]['courses']:
+        if code in dic:
+            return False
     guild_dict[guild_id]['courses'].append({str(code): []})
     save_info()
     return True
