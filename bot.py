@@ -46,7 +46,7 @@ async def add(ctx, course_code):
     if user_has_bot_permissions(ctx.author):
         created = add_course_to_guild(course_code, global_course=True)
         msg = f'{course_code}\'s waitlist created for all TEC servers.' if created else f'{course_code} already has a waitlist'
-        msg += f'\nStudents can join it by typing  **!join {course_code} <their id>**'
+        msg += f'\nAsistentes can add students by typing **!join_waitlist {course_code} <their id>**'
     else:
         msg = 'You can\'t do that'
     await ctx.send(msg)
@@ -106,14 +106,18 @@ async def next(ctx):
 @client.command(brief="Añade al usuario a la fila de asistencia")
 async def join(ctx):
     added = add_to_queue_in_guild(ctx.author, ctx.guild)
-    embed = discord.Embed(title="Lista de Espera",
-                          description="Ayuda Inscripciones", color=0x00ff00)
     if added:
         queue = get_guild_queue(ctx.guild)
+        embed = discord.Embed(title="Lista de Espera",
+                          description="Ayuda Inscripciones", color=0x00ff00)
         embed.set_footer(text="inserta el comando **!join**")
-        embed.add_field(name="Lista", value="\n".join([f'{i+1} {student.mention}' for i, student in enumerate(queue)]), inline=False)
+        if len(queue) is 0:
+            embed.add_field(name="Lista", value="Vacía")
+        else:
+            embed.add_field(name="Lista", value="\n".join([f'{i+1} {student.mention}' for i, student in enumerate(queue)]), inline=False)
     else:
-        embed.color(0xffff00)
+        embed = discord.Embed(title="Lista de Espera",
+                          description="Ayuda Inscripciones", color=0xff0000)
         embed.add_field(name="Ups", value="Ya estas en la lista", inline=False)
     await ctx.send(embed=embed)
 
@@ -124,7 +128,10 @@ async def leave(ctx):
     embed = discord.Embed(title="Lista de Espera",
                           description="Ayuda Inscripciones", color=0xffff00)
     embed.set_footer(text="inserta el comando **!join**")
-    embed.add_field(name="Lista", value="\n".join([f'{i+1} {student.mention}' for i, student in enumerate(queue)]), inline=False)
+    if len(queue) is 0:
+        embed.add_field(name="Lista", value="Vacía")
+    else:
+        embed.add_field(name="Lista", value="\n".join([f'{i+1} {student.mention}' for i, student in enumerate(queue)]), inline=False)
     await ctx.send(embed=embed)
 
 @client.command(brief="Muestra la fila de asistencia")
@@ -133,7 +140,10 @@ async def list(ctx): # TODO: si está vacía di que está vacía
     embed = discord.Embed(title="Lista de Espera",
                           description="Ayuda Inscripciones", color=0x00ff00)
     embed.set_footer(text="inserta el comando **!join**")
-    embed.add_field(name="Lista", value="\n".join([f'{i+1} {student.mention}' for i, student in enumerate(queue)]), inline=False)
+    if len(queue) is 0:
+        embed.add_field(name="Lista", value="Vacía")
+    else:
+        embed.add_field(name="Lista", value="\n".join([f'{i+1} {student.mention}' for i, student in enumerate(queue)]), inline=False)
     await ctx.send(embed=embed)
 
 client.run(open('bot_secret.txt', 'r').read())
