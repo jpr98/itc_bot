@@ -84,19 +84,19 @@ def get_course_waitlist(course_code):
 def add_to_queue_in_guild(user, guild):
     guild_id = guild_bot_id(guild)
     validate_guild_in_dict(guild_id)
-    guild_dict[guild_id]['queue'].append(user)
+    queue_dict[guild_id].append(user)
 
 def leave_from_queue_in_guild(user, guild):
     guild_id = guild_bot_id(guild)
     validate_guild_in_dict(guild_id)
-    if user in guild_dict[guild_id]['queue']:
-        guild_dict[guild_id]['queue'].remove(user)
+    if user in queue_dict[guild_id]:
+        queue_dict[guild_id].remove(user)
 
 def get_next_from_queue_in_guild(assistant, guild):
     guild_id = guild_bot_id(guild)
     validate_guild_in_dict(guild_id)
-    next_user = guild_dict[guild_id]['queue'][0]
-    guild_dict[guild_id]['queue'].remove(next_user)
+    next_user = queue_dict[guild_id][0]
+    queue_dict[guild_id].remove(next_user)
     return next_user
 
 def get_guild_queue(guild):
@@ -104,4 +104,4 @@ def get_guild_queue(guild):
     """
     guild_id = guild_bot_id(guild)
     validate_guild_in_dict(guild_id)
-    return guild_dict[guild_id]['queue']
+    return queue_dict[guild_id]

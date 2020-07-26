@@ -10,8 +10,10 @@ def validate_section_in_guild(section, guild_id):
         guild_dict[guild_id][section] = []
 
 def validate_guild_in_dict(guild_id):
+    if guild_id not in queue_dict:
+        queue_dict[guild_id] = []
     if guild_id not in guild_dict:
-        guild_dict[guild_id] = {'courses': [], 'queue': []}
+        guild_dict[guild_id] = {'courses': []}
 
 def guild_bot_id(guild):
     return f'{guild.name}_{guild.id}'
@@ -36,6 +38,7 @@ def load_data():
         return {}
 
 guild_dict = load_data()
+queue_dict = {}
 
 def get_all_courses():
     courses = []
