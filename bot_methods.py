@@ -84,7 +84,10 @@ def get_course_waitlist(course_code):
 def add_to_queue_in_guild(user, guild):
     guild_id = guild_bot_id(guild)
     validate_guild_in_dict(guild_id)
+    if user in queue_dict[guild_id]:
+        return False
     queue_dict[guild_id].append(user)
+    return True
 
 def leave_from_queue_in_guild(user, guild):
     guild_id = guild_bot_id(guild)
