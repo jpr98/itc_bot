@@ -2,20 +2,26 @@ from enum import Enum, auto
 from bot_internals import *
 from sheets import *
 
+
 def load():
     load_data()
+
 
 def save_info():
     save_data()
     export_to_sheets()
 
+
 def view():
     print(guild_dict)
+
 
 def user_has_bot_permissions(user):
     return user_has_roles(["admin", "asistente"], user)
 
-def add_course_to_guild(code, global_course=False, guild='global'): # gets global_course parameter to make explicit call
+
+#  gets global_course parameter to make explicit call
+def add_course_to_guild(code, global_course=False, guild='global'):
     code = code.upper()
     if global_course:
         guild_id = guild
@@ -29,6 +35,7 @@ def add_course_to_guild(code, global_course=False, guild='global'): # gets glob
     save_info()
     return True
 
+
 class AddStudentResult(Enum):
     SUCCESS = auto()
     NO_COURSE = auto()
@@ -40,6 +47,7 @@ class AddStudentResult(Enum):
 #         return add_student_to_global_course(student_id, course_code)
 #     else:
 #         return result
+
 
 def add_student_to_course(student_id, course_code, guild):
     course_code = course_code.upper()
@@ -53,6 +61,7 @@ def add_student_to_course(student_id, course_code, guild):
             save_info()
             return AddStudentResult.SUCCESS
     return AddStudentResult.NO_COURSE
+
 
 def add_student_to_global_course(student_id, course_code):
     """This function should only be used internally in bot_methods.py
@@ -70,9 +79,11 @@ def add_student_to_global_course(student_id, course_code):
             return AddStudentResult.SUCCESS
     return AddStudentResult.NO_COURSE
 
+
 class GetWaitlistResult(Enum):
     SUCCESS = auto()
     NO_COURSE = auto()
+
 
 def get_course_waitlist(course_code):
     course_code = course_code.upper()
@@ -82,6 +93,7 @@ def get_course_waitlist(course_code):
                 return course[course_code], GetWaitlistResult.SUCCESS
     return [], GetWaitlistResult.NO_COURSE
 
+
 def add_to_queue_in_guild(user, guild):
     guild_id = guild_bot_id(guild)
     validate_guild_in_dict(guild_id)
@@ -90,11 +102,13 @@ def add_to_queue_in_guild(user, guild):
     queue_dict[guild_id].append(user)
     return True
 
+
 def leave_from_queue_in_guild(user, guild):
     guild_id = guild_bot_id(guild)
     validate_guild_in_dict(guild_id)
     if user in queue_dict[guild_id]:
         queue_dict[guild_id].remove(user)
+
 
 def get_next_from_queue_in_guild(assistant, guild):
     guild_id = guild_bot_id(guild)
@@ -103,9 +117,15 @@ def get_next_from_queue_in_guild(assistant, guild):
     queue_dict[guild_id].remove(next_user)
     return next_user
 
+
 def get_guild_queue(guild):
     """ Use this as read-only
     """
     guild_id = guild_bot_id(guild)
     validate_guild_in_dict(guild_id)
     return queue_dict[guild_id]
+
+
+def eraseQueue(guild):
+    g = guild_bot_id(guild)
+    queue_dict[g].clear()

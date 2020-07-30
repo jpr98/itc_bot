@@ -2,13 +2,15 @@ import discord
 from discord.ext import commands
 from bot_methods import *
 
-client = commands.Bot(command_prefix = '!')
+client = commands.Bot(command_prefix='!')
+
 
 @client.event
 async def on_ready():
     print('Bot is ready')
     print(f'Active on {[g.name for g in client.guilds]}')
     load()
+
 
 @client.event
 async def on_member_join(member):
@@ -20,7 +22,8 @@ async def on_member_join(member):
     msg += '\nEspero que esta herramienta te ayude en el proceso de inscripciones :)'
     await member.send(msg)
 
-@commands.has_any_role("admin","asistente")
+
+@commands.has_any_role("admin", "asistente")
 @client.command(brief="Muestra el estado de las listas en la terminal")
 async def debug(ctx):
     if user_has_bot_permissions(ctx.author):
@@ -29,7 +32,7 @@ async def debug(ctx):
     else:
         msg = 'You can\'t to that'
     await ctx.send(msg)
-    
+
 # @client.command()
 # async def add(ctx, course_code):
 #     if user_has_bot_permissions(ctx.author):
@@ -40,7 +43,8 @@ async def debug(ctx):
 #         msg = 'You can\'t do that'
 #     await ctx.send(msg)
 
-@commands.has_any_role("admin","asistente")
+
+@commands.has_any_role("admin", "asistente")
 @client.command(brief="Crea una fila de espera de una materia")
 async def add(ctx, course_code):
     if user_has_bot_permissions(ctx.author):
@@ -51,7 +55,8 @@ async def add(ctx, course_code):
         msg = 'You can\'t do that'
     await ctx.send(msg)
 
-@commands.has_any_role("admin","asistente")
+
+@commands.has_any_role("admin", "asistente")
 @client.command(brief="Añade una matrícula a la fila de espera de una materia")
 async def join_waitlist(ctx, course_code, student_id):
     if user_has_bot_permissions(ctx.author):
@@ -68,6 +73,7 @@ async def join_waitlist(ctx, course_code, student_id):
         msg = 'You can\'t do that'
     await ctx.send(msg)
 
+
 @client.command(brief="Muestra la fila de espera de una materia")
 async def waitlist(ctx, course_code):
     waitlist, result = get_course_waitlist(course_code)
@@ -82,7 +88,8 @@ async def waitlist(ctx, course_code):
         msg = f'{course_code} has no waitlist'
     await ctx.send(msg)
 
-@commands.has_any_role("admin","asistente")
+
+@commands.has_any_role("admin", "asistente")
 @client.command(brief="Elimina n lineas del chat")
 async def clear(ctx, amount=10):
     if user_has_bot_permissions(ctx.author):
@@ -90,18 +97,21 @@ async def clear(ctx, amount=10):
     else:
         await ctx.send('You can\'t do that')
 
-@commands.has_any_role("admin","asistente")
-@client.command(brief="Pasa al siguiente en la fila de asistencia") # TODO: validate asistente in voice channel, index out of range
+
+@commands.has_any_role("admin", "asistente")
+#  TODO: validate asistente in voice channel, index out of range
+@client.command(brief="Pasa al siguiente en la fila de asistencia")
 async def next(ctx):
     if user_has_bot_permissions(ctx.author):
         next_user = get_next_from_queue_in_guild(ctx.author, ctx.guild)
         chan = str(ctx.message.author.voice.channel)
         embed = discord.Embed(title="Por favor pasa a ",
-                          description="", color=0x00ff00)
+                              description="", color=0x00ff00)
         embed.add_field(name=chan, value=next_user.mention, inline=False)
         await ctx.send(embed=embed)
     else:
         await ctx.send('You can\'t do that')
+
 
 @client.command(brief="Añade al usuario a la fila de asistencia")
 async def join(ctx):
@@ -109,17 +119,19 @@ async def join(ctx):
     if added:
         queue = get_guild_queue(ctx.guild)
         embed = discord.Embed(title="Lista de Espera",
-                          description="Ayuda Inscripciones", color=0x00ff00)
+                              description="Ayuda Inscripciones", color=0x00ff00)
         embed.set_footer(text="inserta el comando **!join**")
         if len(queue) is 0:
             embed.add_field(name="Lista", value="Vacía")
         else:
-            embed.add_field(name="Lista", value="\n".join([f'{i+1} {student.mention}' for i, student in enumerate(queue)]), inline=False)
+            embed.add_field(name="Lista", value="\n".join(
+                [f'{i+1} {student.mention}' for i, student in enumerate(queue)]), inline=False)
     else:
         embed = discord.Embed(title="Lista de Espera",
-                          description="Ayuda Inscripciones", color=0xff0000)
+                              description="Ayuda Inscripciones", color=0xff0000)
         embed.add_field(name="Ups", value="Ya estas en la lista", inline=False)
     await ctx.send(embed=embed)
+
 
 @client.command(brief="Remueve al usuario de la fila de asistencia")
 async def leave(ctx):
@@ -131,11 +143,13 @@ async def leave(ctx):
     if len(queue) is 0:
         embed.add_field(name="Lista", value="Vacía")
     else:
-        embed.add_field(name="Lista", value="\n".join([f'{i+1} {student.mention}' for i, student in enumerate(queue)]), inline=False)
+        embed.add_field(name="Lista", value="\n".join(
+            [f'{i+1} {student.mention}' for i, student in enumerate(queue)]), inline=False)
     await ctx.send(embed=embed)
 
+
 @client.command(brief="Muestra la fila de asistencia")
-async def list(ctx): # TODO: si está vacía di que está vacía 
+async def list(ctx):
     queue = get_guild_queue(ctx.guild)
     embed = discord.Embed(title="Lista de Espera",
                           description="Ayuda Inscripciones", color=0x00ff00)
@@ -143,7 +157,16 @@ async def list(ctx): # TODO: si está vacía di que está vacía
     if len(queue) is 0:
         embed.add_field(name="Lista", value="Vacía")
     else:
-        embed.add_field(name="Lista", value="\n".join([f'{i+1} {student.mention}' for i, student in enumerate(queue)]), inline=False)
+        embed.add_field(name="Lista", value="\n".join(
+            [f'{i+1} {student.mention}' for i, student in enumerate(queue)]), inline=False)
     await ctx.send(embed=embed)
+
+
+@client.command(brief="Vacia la fila de espera")
+async def empty(ctx):
+    if(user_has_bot_permissions(ctx.author)):
+        eraseQueue(ctx.guild)
+    else:
+        await ctx.send('You can\'t do that')
 
 client.run(open('bot_secret.txt', 'r').read())
