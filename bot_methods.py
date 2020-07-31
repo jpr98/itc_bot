@@ -31,7 +31,7 @@ def add_course_to_guild(code, global_course=False, guild='global'):
     for dic in guild_dict[guild_id]['courses']:
         if code in dic:
             return False
-    guild_dict[guild_id]['courses'].append({str(code): []})
+    guild_dict[guild_id]['courses'].append({str(code): [], "done": []})
     save_info()
     return True
 
@@ -58,6 +58,7 @@ def add_student_to_course(student_id, course_code, guild):
             if student_id in course[course_code]:
                 return AddStudentResult.REPEATED_ID
             course[course_code].append(f'{student_id}-{guild.name}')
+            course['done'].append(False)
             save_info()
             return AddStudentResult.SUCCESS
     return AddStudentResult.NO_COURSE
@@ -79,11 +80,39 @@ def add_student_to_global_course(student_id, course_code):
             return AddStudentResult.SUCCESS
     return AddStudentResult.NO_COURSE
 
+class MarkStudentDoneResult(Enum):
+    SUCCESS = auto()
+    NO_COURSE = auto()
+    NO_STUDENT = auto()
+
+def mark_student_as_done_in_course(student_id, course_code):
+    course_code = course_code.upper()
+    guild_id = 'global'
+    validate_guild_in_dict(guild_id)
+    for course in guild_dict[guild_id]['courses']:
+         if course_code in course:
+             for i, student in enumerate(course[course_code]):
+                 if student_id in student:
+                     course['done'][i] = True
+                     return MarkStudentDoneResult.SUCCESS
+             return MarkStudentDoneResult.NO_STUDENT
+    return MarkStudentDoneResult.NO_COURSE
+
+def remove_student_from_course(student_id, course_code):
+    course_code = course_code.upper()
+    guild_id = 'global'
+    validate_guild_in_dict(guild_id)
+    for course in guild_dict[guild_id]['courses']:
+         if course_code in course:
+             for i, student in enumerate(course[course_code]):
+                 if student_id in student:
+                     course[course_code].remove(student)
+                     course['done'].pop(i)
+                     save_info()
 
 class GetWaitlistResult(Enum):
     SUCCESS = auto()
     NO_COURSE = auto()
-
 
 def get_course_waitlist(course_code):
     course_code = course_code.upper()

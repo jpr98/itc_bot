@@ -73,6 +73,35 @@ async def join_waitlist(ctx, course_code, student_id):
         msg = 'You can\'t do that'
     await ctx.send(msg)
 
+@commands.has_any_role("admin", "asistente")
+@client.command(brief="Marca como listo a un alumno")
+async def done(ctx, course_code, *student_id):
+    if user_has_bot_permissions(ctx.author):
+        msg = ''
+        for student in student_id:
+            result = mark_student_as_done_in_course(student, course_code)
+            if result is MarkStudentDoneResult.NO_COURSE:
+                msg = f'{course_code} has no waitlist'
+                break
+            elif result is MarkStudentDoneResult.NO_STUDENT:
+                msg += f'{student} not in waitlist for {course_code}\n'
+            elif result is MarkStudentDoneResult.SUCCESS:
+                msg += f'{student} - done\n'
+    else:
+        msg = 'You can\'t do that'
+    save_info()
+    await ctx.send(msg)
+
+@commands.has_any_role("admin", "asistente")
+@client.command(brief="Elimina un alumno de una lista de espera")
+async def delete(ctx, course_code, student_id):
+    if user_has_bot_permissions(ctx.author):
+        remove_student_from_course(student_id, course_code)
+        msg = 'Done'
+    else:
+        msg = 'You can\'t do that'
+    await ctx.send(msg)
+
 
 @client.command(brief="Muestra la fila de espera de una materia")
 async def waitlist(ctx, course_code):

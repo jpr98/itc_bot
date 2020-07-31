@@ -46,12 +46,15 @@ def get_all_courses():
     for guild in guild_dict:
         for course in guild_dict[guild]['courses']:
             for course_code in course:
-                courses.append(course_code)
+                if course_code == 'done':
+                    continue
+                else:
+                    courses.append(course_code)
     return courses
 
 def get_course_waitlist(course_code):
     for guild in guild_dict:
         for course in guild_dict[guild]['courses']:
             if course_code in course:
-                return course[course_code]
+                return course
     return []

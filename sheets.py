@@ -14,6 +14,15 @@ sheet = workspace.sheet1
 
 #workspace.share('juanpramoss98@gmail.com', perm_type='user', role='reader')
 
+def make_formatted_list(waitlist, done):
+    vals = []
+    for i, val in enumerate(waitlist):
+        if done[i]:
+            val = f'DONE - {val}'
+        vals.append(val)
+    return [[y] for y in vals]
+
+
 def export_to_sheets():
     sheet.clear()
     course_codes = get_all_courses()
@@ -21,11 +30,11 @@ def export_to_sheets():
 
     for i in range(len(course_codes)):
         course_code = course_codes[i]
-        waitlist = get_course_waitlist(course_code)
+        course = get_course_waitlist(course_code)
+        waitlist = course[course_code]
+        done = course['done']
         initpos = gspread.utils.rowcol_to_a1(2,i+1)
         finalpos = gspread.utils.rowcol_to_a1(2+len(waitlist),i+1)
         ran = f'{initpos}:{finalpos}'
-        formatted = [[y] for y in waitlist]
+        formatted = make_formatted_list(waitlist, done)
         sheet.update(ran,formatted)
-
-
