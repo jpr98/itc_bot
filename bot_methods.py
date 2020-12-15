@@ -19,6 +19,7 @@ class AddStudentResult(Enum):
 
 def add_student_to_course(student_id, course_code, guild):
     course_code = course_code.upper()
+    student_id = student_id.upper()
     result = add_to_course(student_id, guild.name, course_code)
     if result == 0:
         return AddStudentResult.NO_COURSE
@@ -35,6 +36,7 @@ class MarkStudentDoneResult(Enum):
 
 def mark_student_as_done_in_course(student_id, course_code):
     course_code = course_code.upper()
+    student_id = student_id.upper()
     result = mark_student_done(student_id, course_code)
     if result == 0:
         return MarkStudentDoneResult.NO_COURSE
@@ -46,10 +48,13 @@ def mark_student_as_done_in_course(student_id, course_code):
 
 def remove_student_from_course(student_id, course_code):
     course_code = course_code.upper()
+    student_id = student_id.upper()
     delete_student_from_course(student_id, course_code)
 
 
 ############ VOICE QUEUE METHODS #############
+queue_dict = {}
+
 def add_to_queue_in_guild(user, guild):
     guild_id = guild_bot_id(guild)
     validate_guild_in_dict(guild_id)
@@ -86,11 +91,18 @@ def eraseQueue(guild):
     g = guild_bot_id(guild)
     queue_dict[g].clear()
 
+
 def guild_bot_id(guild):
     return f'{guild.name}_{guild.id}'
+
 
 def user_has_roles(roles, user):
     for role in roles:
         if role in [r.name.lower() for r in user.roles]:
             return True
     return False
+
+
+def validate_guild_in_dict(guild_id):
+    if guild_id not in queue_dict:
+        queue_dict[guild_id] = []
