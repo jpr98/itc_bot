@@ -9,7 +9,6 @@ client = commands.Bot(command_prefix='!')
 async def on_ready():
     print('Bot is ready')
     print(f'Active on {[g.name for g in client.guilds]}')
-    load()
 
 
 @client.event
@@ -23,32 +22,22 @@ async def on_member_join(member):
     await member.send(msg)
 
 
+############ HELPER COMMANDS #############
 @commands.has_any_role("admin", "asistente")
-@client.command(brief="Muestra el estado de las listas en la terminal")
-async def debug(ctx):
+@client.command(brief="Elimina n lineas del chat")
+async def clear(ctx, amount=10):
     if user_has_bot_permissions(ctx.author):
-        view()
-        msg = 'Content shown in server\'s shell'
+        await ctx.channel.purge(limit=amount)
     else:
-        msg = 'You can\'t to that'
-    await ctx.send(msg)
-
-# @client.command()
-# async def add(ctx, course_code):
-#     if user_has_bot_permissions(ctx.author):
-#         created = add_course_to_guild(course_code, global_course=False, guild=ctx.guild)
-#         msg = f'{course_code}\'s waitlist created.' if created else f'{course_code} already has a waitlist'
-#         msg += f'\nStudents can join it by typing  **!join {course_code} <their id>**'
-#     else:
-#         msg = 'You can\'t do that'
-#     await ctx.send(msg)
+        await ctx.send('You can\'t do that')
 
 
+############ COURSE QUEUE COMMANDS #############
 @commands.has_any_role("admin", "asistente")
 @client.command(brief="Crea una fila de espera de una materia")
 async def add(ctx, course_code):
     if user_has_bot_permissions(ctx.author):
-        created = add_course_to_guild(course_code, global_course=True)
+        created = add_course_waitlist(course_code)
         msg = f'{course_code}\'s waitlist created for all TEC servers.' if created else f'{course_code} already has a waitlist'
         msg += f'\nAsistentes can add students by typing **!join_waitlist {course_code} <their id>**'
     else:
@@ -73,6 +62,18 @@ async def join_waitlist(ctx, course_code, student_id):
         msg = 'You can\'t do that'
     await ctx.send(msg)
 
+
+@commands.has_any_role("admin", "asistente")
+@client.command(brief="Elimina un alumno de una lista de espera")
+async def leave_waitlist(ctx, course_code, student_id):
+    if user_has_bot_permissions(ctx.author):
+        remove_student_from_course(student_id, course_code)
+        msg = 'Done'
+    else:
+        msg = 'You can\'t do that'
+    await ctx.send(msg)
+
+
 @commands.has_any_role("admin", "asistente")
 @client.command(brief="Marca como listo a un alumno")
 async def done(ctx, course_code, *student_id):
@@ -89,44 +90,10 @@ async def done(ctx, course_code, *student_id):
                 msg += f'{student} - done\n'
     else:
         msg = 'You can\'t do that'
-    save_info()
     await ctx.send(msg)
+    
 
-@commands.has_any_role("admin", "asistente")
-@client.command(brief="Elimina un alumno de una lista de espera")
-async def delete(ctx, course_code, student_id):
-    if user_has_bot_permissions(ctx.author):
-        remove_student_from_course(student_id, course_code)
-        msg = 'Done'
-    else:
-        msg = 'You can\'t do that'
-    await ctx.send(msg)
-
-
-@client.command(brief="Muestra la fila de espera de una materia")
-async def waitlist(ctx, course_code):
-    waitlist, result = get_course_waitlist(course_code)
-    if result == GetWaitlistResult.SUCCESS:
-        if len(waitlist) == 0:
-            msg = f'The waitlist for {course_code} is empty'
-        else:
-            msg = f'{course_code}\'s waitlist:'
-            for student in waitlist:
-                msg += f'\n\t{student}'
-    elif result == GetWaitlistResult.NO_COURSE:
-        msg = f'{course_code} has no waitlist'
-    await ctx.send(msg)
-
-
-@commands.has_any_role("admin", "asistente")
-@client.command(brief="Elimina n lineas del chat")
-async def clear(ctx, amount=10):
-    if user_has_bot_permissions(ctx.author):
-        await ctx.channel.purge(limit=amount)
-    else:
-        await ctx.send('You can\'t do that')
-
-
+############ VOICE QUEUE COMMANDS #############
 @commands.has_any_role("admin", "asistente")
 #  TODO: validate asistente in voice channel, index out of range
 @client.command(brief="Pasa al siguiente en la fila de asistencia")
